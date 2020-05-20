@@ -2,14 +2,14 @@ import request from '@/utils/request'
 
 export function fetchList() {
   return request({
-    url: 'blog/type/list',
+    url: 'admin/type/list',
     method: 'get'
   })
 }
 
 export function addType(data) {
   return request({
-    url: 'blog/type/add',
+    url: 'admin/type/add',
     method: 'post',
     data
   })
@@ -17,7 +17,7 @@ export function addType(data) {
 
 export function updateType(data) {
   return request({
-    url: 'blog/type/update',
+    url: 'admin/type/update',
     method: 'put',
     data
   })
@@ -25,7 +25,7 @@ export function updateType(data) {
 
 export function removeType(id) {
   return request({
-    url: 'blog/type/delete/' + id,
+    url: 'admin/type/delete/' + id,
     method: 'delete'
   })
 }

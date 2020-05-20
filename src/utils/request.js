@@ -45,6 +45,21 @@ service.interceptors.response.use(
   response => {
     const res = response.data
 
+    // 管理员未登录
+    if (res.code === 50004) {
+      Message({
+        message: res.message || '你还未登录，请登录',
+        type: 'error',
+        duration: 2 * 1000,
+        onClose() {
+          store.dispatch('user/resetToken').then(() => {
+            location.reload() // 为了重新实例化vue-router对象 避免bug
+          })
+        }
+      })
+      return
+    }
+
     // if the custom code is not 20000, it is judged as an error.
     if (res.code !== 20000) {
       Message({
@@ -52,18 +67,6 @@ service.interceptors.response.use(
         type: 'error',
         duration: 5 * 1000
       })
-
-      if (res.code === 50004) {
-        Message({
-          message: res.message || '你还未登录，请登录',
-          type: 'error',
-          duration: 5 * 1000
-        }).then(() => {
-          store.dispatch('user/resetToken').then(() => {
-            location.reload() // 为了重新实例化vue-router对象 避免bug
-          })
-        })
-      }
 
       // 50008:非法的token; 50012:其他客户端登录了;  50014:Token 过期了;
       if (res.code === 50008 || res.code === 50012 || res.code === 50014) {

@@ -70,21 +70,28 @@ export const constantRoutes = [
   {
     path: '/blog',
     component: Layout,
-    redirect: '/blog/table',
+    redirect: '/blog/list',
     name: 'Blog',
     meta: { title: '博客管理', icon: 'example' },
     children: [
       {
-        path: 'table',
-        name: 'Table',
+        path: 'list',
+        name: 'ArticleList',
         component: () => import('@/views/blog/list/index'),
         meta: { title: '博客列表', icon: 'list-ul' }
       },
       {
-        path: 'add',
-        name: 'Add',
-        component: () => import('@/views/blog/add/index'),
-        meta: { title: '博客添加', icon: 'edit' }
+        path: 'create',
+        component: () => import('@/views/blog/add/create'),
+        name: 'CreateArticle',
+        meta: { title: '添加博客', icon: 'edit' }
+      },
+      {
+        path: 'edit/:id(\\d+)',
+        component: () => import('@/views/blog/add/edit'),
+        name: 'EditArticle',
+        meta: { title: '编辑博客', noCache: true, activeMenu: '/blog/list' },
+        hidden: true
       }
     ]
   },
@@ -179,8 +186,8 @@ export const constantRoutes = [
     component: Layout,
     children: [
       {
-        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-        meta: { title: 'External Link', icon: 'link' }
+        path: 'https://github.com/SX-Code/vue-blog-admin',
+        meta: { title: 'GitHub地址', icon: 'link' }
       }
     ]
   },

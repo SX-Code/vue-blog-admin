@@ -24,16 +24,26 @@
           {{ scope.row.title }}
         </template>
       </el-table-column>
+
       <el-table-column label="类型" align="center">
         <template slot-scope="scope">
           <span>{{ scope.row.typeName }}</span>
         </template>
       </el-table-column>
+
+      <el-table-column label="推荐" align="center" width="130">
+        <template slot-scope="scope">
+          <el-button v-if="scope.row.recommend" type="success" circle icon="el-icon-check" size="mini" @click="switchRecommend(scope.row)" />
+          <el-button v-else type="warning" circle icon="el-icon-close" size="mini" @click="switchRecommend(scope.row)" />
+        </template>
+      </el-table-column>
+
       <el-table-column class-name="status-col" label="发布状态" width="120" align="center">
         <template slot-scope="scope">
           <el-tag :type="scope.row.published | statusFilter">{{ scope.row.published ? '发布' : '草稿' }}</el-tag>
         </template>
       </el-table-column>
+
       <el-table-column align="center" prop="created_at" label="更新时间" width="220">
         <template slot-scope="scope">
           <i class="el-icon-time" />
@@ -42,8 +52,8 @@
       </el-table-column>
       <el-table-column width="200">
         <template slot-scope="scope">
-          <el-button type="success" size="small" icon="el-icon-edit" :data-value="scope.row.id">编辑</el-button>
-          <el-button type="danger" size="small" icon="el-icon-delete" :data-value="scope.row.id">删除</el-button>
+          <el-button type="success" size="small" icon="el-icon-edit" @click="editBlog(scope.row.id)">编辑</el-button>
+          <el-button type="danger" size="small" icon="el-icon-delete" @click="remove(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -61,7 +71,7 @@
 </template>
 
 <script>
-import { getList } from '@/api/table'
+import { getList, removeArticle, updateRecommend } from '@/api/article'
 
 export default {
   filters: {
@@ -73,6 +83,7 @@ export default {
       return statusMap[status]
     }
   },
+  inject: ['reload'],
   data() {
     return {
       list: null,
@@ -106,8 +117,41 @@ export default {
       this.fetchData()
     },
     time(time) { // 时间戳转换
-      var date = new Date(time * 1000)
-      return date.toJSON().substr(0, 10)
+      return time.substr(0, 10)
+    },
+    editBlog(id) { // 编辑博客
+      this.$router.push('/blog/edit/' + id)
+    },
+    remove(id) {
+      this.$confirm('此操作将删除该博客，是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async() => {
+        const res = await removeArticle(id)
+        if (res.code === 20000) {
+          this.reload()
+          return this.$message({
+            type: 'success',
+            message: res.message || '删除成功'
+          })
+        }
+      }).catch(() => {
+        this.$message({
+          message: '取消删除',
+          type: 'info'
+        })
+      })
+    },
+    async switchRecommend(row) {
+      const res = await updateRecommend(row.id, !row.recommend)
+      if (res.code === 20000) {
+        this.reload()
+        return this.$message({
+          type: 'success',
+          message: res.message || '修改成功'
+        })
+      }
     }
   }
 }

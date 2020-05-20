@@ -187,16 +187,12 @@ export default {
       }).then(async() => {
         const res = await removeTag(row.id)
         if (res.code !== 20000) {
-          return this.$message({
-            type: 'error',
-            message: res.message | '删除失败'
+          this.reload()
+          this.$message({
+            type: 'success',
+            message: '删除成功'
           })
         }
-        this.reload()
-        this.$message({
-          type: 'success',
-          message: '删除成功'
-        })
       }).catch(() => {
         this.$message({
           type: 'info',

@@ -1,17 +1,17 @@
 <template>
   <el-dropdown :show-timeout="100" trigger="click">
     <el-button plain size="small">
-      {{ commentable?'评论: 开':'评论: 关' }}
+      {{ recommend?'推荐: 开':'推荐: 关' }}
       <i class="el-icon-caret-bottom el-icon--right" />
     </el-button>
     <el-dropdown-menu slot="dropdown" class="no-padding">
       <el-dropdown-item>
-        <el-radio-group v-model="commentable" style="padding: 10px;">
-          <el-radio :label="true">
-            关闭评论
-          </el-radio>
+        <el-radio-group v-model="recommend" style="padding: 10px;">
           <el-radio :label="false">
-            开启评论
+            关闭推荐
+          </el-radio>
+          <el-radio :label="true">
+            开启推荐
           </el-radio>
         </el-radio-group>
       </el-dropdown-item>
@@ -24,11 +24,11 @@ export default {
   props: {
     value: {
       type: Boolean,
-      default: false
+      default: true
     }
   },
   computed: {
-    commentable: {
+    recommend: {
       get() {
         return this.value
       },

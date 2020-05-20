@@ -3,6 +3,8 @@
     <el-form ref="postForm" :model="postForm" :rules="rules" class="form-container">
       <sticky :z-index="10" :class-name="'sub-navbar '+postForm.published">
         <CommentDropdown v-model="postForm.commentable" />
+        <AppreciateDropdown v-model="postForm.appreciate" />
+        <RecommendDropdown v-model="postForm.recommend" />
         <el-button v-loading="loading" size="small" style="margin-left: 10px;" type="success" @click="publish()">发布</el-button>
         <el-button v-loading="loading" size="small" type="warning" @click="draft()">草稿</el-button>
       </sticky>
@@ -14,13 +16,13 @@
             </el-form-item>
             <div class="postInfo-container">
               <el-row>
-                <el-col :span="4">
+                <el-col :span="8">
                   <el-form-item label-width="45px" label="作者:" class="postInfo-container-item">
                     <el-input v-model="postForm.author" placeholder="sw-code" disabled />
                   </el-form-item>
                 </el-col>
 
-                <el-col :span="7">
+                <el-col :span="8">
                   <el-form-item label-width="120px" label="发布时间:" class="postInfo-container-item">
                     <el-date-picker
                       v-model="displayTime"
@@ -31,7 +33,7 @@
                   </el-form-item>
                 </el-col>
 
-                <el-col :span="5">
+                <el-col :span="8">
                   <el-form-item label-width="90px" label="标志:" class="postInfo-container-item">
                     <el-select v-model="postForm.flag" placeholder="原创">
                       <el-option label="原创" value="原创" />
@@ -40,25 +42,12 @@
                     </el-select>
                   </el-form-item>
                 </el-col>
-
-                <el-col :span="3">
-                  <el-form-item label-width="90px" label="是否推荐:" class="postInfo-container-item">
-                    <el-checkbox v-model="postForm.recommend" />
-                  </el-form-item>
-                </el-col>
-
-                <el-col :span="3">
-                  <el-form-item label-width="90px" label="是否可赞赏:" class="postInfo-container-item">
-                    <el-checkbox v-model="postForm.appreciate" />
-                  </el-form-item>
-                </el-col>
-
               </el-row>
             </div>
           </el-col>
         </el-row>
 
-        <el-form-item style="margin-bottom: 40px;" label-width="72px" label="文章摘要:">
+        <el-form-item style="margin-bottom: 40px;" label-width="72px" label="文章摘要:" prop="describe">
           <el-input
             v-model="postForm.describe"
             :rows="1"
@@ -69,7 +58,7 @@
           />
           <span v-show="contentShortLength" class="word-counter">{{ contentShortLength }}words</span>
         </el-form-item>
-        <el-form-item>
+        <el-form-item prop="content">
           <mavon-editor
             ref="md"
             v-model="postForm.content"
@@ -87,13 +76,15 @@
 import { validURL } from '@/utils/validate'
 import Sticky from '@/components/Sticky' // 粘性header组件
 import MDinput from '@/components/MDinput'
-import { CommentDropdown } from './Dropdown'
+import { CommentDropdown, AppreciateDropdown, RecommendDropdown } from './Dropdown'
 // mavon-editor markdown编辑器
 import { mavonEditor } from 'mavon-editor'
 import 'mavon-editor/dist/css/index.css'
 import { postPicture } from '@/api/blog'
+import { fetchArticle, postArticle } from '@/api/article'
 const defaultForm = {
-  published: 'draft',
+  id: null,
+  published: 0,
   author: 'sw-code',
   title: '', // 文章题目
   content: '', // 文章内容
@@ -101,25 +92,21 @@ const defaultForm = {
   firstPicture: '', // 文章图片
   updateTime: undefined, // 前台展示时间
   flag: '原创',
-  // comment_disabled: false,
   commentable: true,
   recommend: true,
   appreciate: true
 }
 export default {
-  components: {
-    Sticky,
-    CommentDropdown,
-    MDinput,
-    mavonEditor
+  components: { Sticky, CommentDropdown, AppreciateDropdown, RecommendDropdown, MDinput, mavonEditor },
+  props: {
+    isEdit: {
+      type: Boolean,
+      default: false
+    }
   },
   data() {
     const validateRequire = (rule, value, callback) => {
       if (value === '') {
-        this.$message({
-          message: rule.field + '为必传项',
-          type: 'error'
-        })
         callback(new Error(rule.field + '为必传项'))
       } else {
         callback()
@@ -147,6 +134,7 @@ export default {
         image_uri: [{ validator: validateRequire }],
         title: [{ validator: validateRequire }],
         content: [{ validator: validateRequire }],
+        describe: [{ validator: validateRequire }],
         source_uri: [{ validator: validateSourceUri, trigger: 'blur' }]
       }
     }
@@ -156,10 +144,6 @@ export default {
       return this.postForm.describe.length
     },
     displayTime: {
-      // set and get is useful when the data
-      // returned by the back end api is different from the front end
-      // back end return => "2013-06-25 06:59:25"
-      // front end need timestamp => 1372114765000
       get() {
         return +new Date(this.postForm.updateTime)
       },
@@ -168,7 +152,17 @@ export default {
       }
     }
   },
+  created() {
+    if (this.isEdit) {
+      const id = this.$route.params && this.$route.params.id
+      this.fetchData(id)
+    }
+  },
   methods: {
+    async fetchData(id) {
+      const res = await fetchArticle(id)
+      this.postForm = res.data
+    },
     // 将图片上传到服务器，返回地址替换到md中
     $imgAdd(pos, $file) {
       var formdata = new FormData()
@@ -176,25 +170,31 @@ export default {
       postPicture(formdata).then(response => {
         this.$refs.md.$img2Url(pos, response.data.url)
       })
-      // this.$axios({
-      //   url: '/common/upload',
-      //   method: 'post',
-      //   data: formdata,
-      //   headers: { 'Content-Type': 'multipart/form-data' }
-      // }).then(url => {
-      //   this.$refs.md.$img2Url(pos, url)
-      // })
     },
     change(value, render) {
       // render 为 markdown 解析后的结果
     },
+    postData() {
+      this.$refs.postForm.validate(async(vaild) => {
+        if (vaild) {
+          const res = await postArticle(this.postForm)
+          if (res.code === 20000) {
+            this.$router.push('/blog/list')
+            return this.$message({
+              message: res.message,
+              type: 'success'
+            })
+          }
+        }
+      })
+    },
     draft() {
-      this.postForm.published = 'draft'
-      console.log(this.postForm)
+      this.postForm.published = 0
+      this.postData()
     },
     publish() {
-      this.postForm.published = 'publish'
-      console.log(this.postForm)
+      this.postForm.published = 1
+      this.postData()
     }
   }
 }

@@ -167,16 +167,12 @@ export default {
       row.updateTime = new Date().toJSON()
       row.originalName = row.name
       const { code, message } = await updateType(row)
-      if (code !== 20000) {
+      if (code === 20000) {
         return this.$message({
-          message: message || '修改失败',
-          type: 'error'
+          message: message || '修改成功',
+          type: 'success'
         })
       }
-      this.$message({
-        message: '修改成功',
-        type: 'success'
-      })
     },
     // 删除 Type
     deleteType(row) {
