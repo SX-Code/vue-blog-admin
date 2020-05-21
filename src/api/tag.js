@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function fetchList() {
+export function fetchTagList() {
   return request({
     url: 'admin/tag/list',
     method: 'get'

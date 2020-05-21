@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import { fetchList, addTag, updateTag, removeTag } from '@/api/type/admin/tag'
+import { fetchTagList, addTag, updateTag, removeTag } from '@/api/tag'
 
 export default {
   filters: {
@@ -120,7 +120,7 @@ export default {
   methods: {
     async getList() {
       this.listLoading = true
-      const { data } = await fetchList()
+      const { data } = await fetchTagList()
       this.list = data.map(v => {
         this.$set(v, 'edit', false)
         v.originalName = v.name

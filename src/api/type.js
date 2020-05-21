@@ -1,6 +1,6 @@
 import request from '@/utils/request'
 
-export function fetchList() {
+export function fetchTypeList() {
   return request({
     url: 'admin/type/list',
     method: 'get'

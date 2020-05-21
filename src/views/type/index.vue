@@ -89,7 +89,7 @@
 </template>
 
 <script>
-import { fetchList, addType, updateType, removeType } from '@/api/type/admin/type'
+import { fetchTypeList, addType, updateType, removeType } from '@/api/type'
 
 export default {
   filters: {
@@ -115,12 +115,12 @@ export default {
     }
   },
   created() {
-    this.getList()
+    this.getchList()
   },
   methods: {
-    async getList() {
+    async fetchList() {
       this.listLoading = true
-      const { data } = await fetchList()
+      const { data } = await fetchTypeList()
       this.list = data.map(v => {
         this.$set(v, 'edit', false)
         v.originalName = v.name

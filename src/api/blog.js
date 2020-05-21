@@ -10,8 +10,8 @@ export function getList(params) {
 
 export function postPicture(data) {
   return request({
-    url: '/admin/blog/upload',
-    type: 'post',
+    url: '/admin/upload',
+    method: 'post',
     headers: { 'Content-Type': 'multipart/form-data' },
     data
   })
