@@ -107,6 +107,7 @@ const defaultForm = {
   flag: '原创', // 文章标志
   published: 0, // 发布状态
   recommend: true, // 是否推荐
+  shareStatement: false, // 是否可转载
   title: '', // 文章题目
   views: 0, // 文章浏览数
   typeId: null, // 文章类别

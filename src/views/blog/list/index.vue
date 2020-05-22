@@ -1,10 +1,14 @@
 <template>
   <div class="app-container">
     <div class="filter-container">
-      <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" @keyup.enter.native="fetchData" />
-      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="fetchData">
-        Search
-      </el-button>
+      <el-form ref="queryForm" :model="listQuery" :rules="rules" class="form-container">
+        <el-form-item prop="title" style="display:inline-block">
+          <el-input v-model="listQuery.title" placeholder="Title" style="width: 200px;" class="filter-item" />
+        </el-form-item>
+        <el-button class="filter-item" type="primary" icon="el-icon-search" @click="search()">
+          Search
+        </el-button>
+      </el-form>
     </div>
     <el-table
       v-loading="listLoading"
@@ -93,6 +97,9 @@ export default {
         title: '',
         page: 1,
         size: 5
+      },
+      rules: {
+        title: [{ required: true, message: '请输入搜索条件', trigger: 'blur' }]
       }
     }
   },
@@ -152,6 +159,13 @@ export default {
           message: res.message || '修改成功'
         })
       }
+    },
+    search() {
+      this.$refs.queryForm.validate(valid => {
+        if (valid) {
+          this.fetchData()
+        }
+      })
     }
   }
 }
