@@ -115,7 +115,7 @@ export default {
     }
   },
   created() {
-    this.getchList()
+    this.fetchList()
   },
   methods: {
     async fetchList() {
