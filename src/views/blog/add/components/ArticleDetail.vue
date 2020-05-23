@@ -80,6 +80,19 @@
             @change="change"
           />
         </el-form-item>
+
+        <el-form-item>
+          <el-row>
+            <el-col :span="12">
+              <cropper @pictureURL="setFirstPicture" />
+            </el-col>
+            <el-col :span="12">
+              <div class="firstPicture">
+                <img :src="postForm.firstPicture" alt="">
+              </div>
+            </el-col>
+          </el-row>
+        </el-form-item>
       </div>
     </el-form>
   </div>
@@ -89,6 +102,7 @@
 import { validURL } from '@/utils/validate'
 import Sticky from '@/components/Sticky' // 粘性header组件
 import MDinput from '@/components/MDinput'
+import Cropper from '@/components/Cropper'
 import { CommentDropdown, AppreciateDropdown, RecommendDropdown } from './Dropdown'
 // mavon-editor markdown编辑器
 import { mavonEditor } from 'mavon-editor'
@@ -117,7 +131,7 @@ const defaultForm = {
   tags: [] // 文章标签 ids
 }
 export default {
-  components: { Sticky, CommentDropdown, AppreciateDropdown, RecommendDropdown, MDinput, mavonEditor },
+  components: { Sticky, CommentDropdown, AppreciateDropdown, RecommendDropdown, MDinput, mavonEditor, Cropper },
   props: {
     isEdit: {
       type: Boolean,
@@ -206,8 +220,13 @@ export default {
     },
     postData() {
       this.$refs.postForm.validate(async(vaild) => {
+        if (this.postForm.firstPicture === '') {
+          this.$message({
+            type: 'warning',
+            message: '需要设置文章首图'
+          })
+        }
         if (vaild) {
-          console.log(this.postForm)
           const res = await postArticle(this.postForm)
           if (res.code === 20000) {
             this.$router.push('/blog/list')
@@ -226,6 +245,10 @@ export default {
     publish() {
       this.postForm.published = 1
       this.postData()
+    },
+    setFirstPicture(pictureURL) {
+      this.postForm.firstPicture = pictureURL
+      console.log(this.postForm.firstPicture)
     }
   }
 }
@@ -240,5 +263,16 @@ export default {
 }
 .v-note-wrapper{
   z-index: 1;
+}
+.firstPicture{
+  width: 316px;
+  height: 178px;
+  border-radius: 6px;
+  border: 1px dashed #d9d9d9;
+  overflow: hidden;
+}
+.firstPicture>img{
+  width: 100%;
+  height: 100%;
 }
 </style>

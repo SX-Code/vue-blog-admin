@@ -41,7 +41,7 @@ const actions = {
             message: '欢迎进入博客管理系统，今天是个好日子！',
             position: 'top-right',
             type: 'success',
-            duration: 2000
+            duration: 4000
           })
         }
         commit('SET_TOKEN', data.token)
