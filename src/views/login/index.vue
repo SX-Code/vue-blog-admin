@@ -1,9 +1,16 @@
 <template>
   <div class="login-container">
-    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
-
+    <vue-particles color="#dedede" />
+    <el-form
+      ref="loginForm"
+      :model="loginForm"
+      :rules="loginRules"
+      class="login-form"
+      auto-complete="on"
+      label-position="left"
+    >
       <div class="title-container">
-        <h3 class="title">登  录</h3>
+        <h3 class="title">登 录</h3>
       </div>
 
       <el-form-item prop="username">
@@ -41,13 +48,13 @@
         </span>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
-
-      <!-- <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div> -->
-
+      <el-button
+        class="loginBtn"
+        :loading="loading"
+        type="primary"
+        style="width:100%;margin-bottom:30px;"
+        @click.native.prevent="handleLogin"
+      >Login</el-button>
     </el-form>
   </div>
 </template>
@@ -78,8 +85,12 @@ export default {
         password: '123456'
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        username: [
+          { required: true, trigger: 'blur', validator: validateUsername }
+        ],
+        password: [
+          { required: true, trigger: 'blur', validator: validatePassword }
+        ]
       },
       loading: false,
       passwordType: 'password',
@@ -109,12 +120,15 @@ export default {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
           this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
-          })
+          this.$store
+            .dispatch('user/login', this.loginForm)
+            .then(() => {
+              this.$router.push({ path: this.redirect || '/' })
+              this.loading = false
+            })
+            .catch(() => {
+              this.loading = false
+            })
         } else {
           console.log('error submit!!')
           return false
@@ -128,9 +142,23 @@ export default {
 <style lang="scss">
 /* 修复input 背景不协调 和光标变色 */
 /* Detail see https://github.com/PanJiaChen/vue-element-admin/pull/927 */
-
-$bg:#283443;
-$light_gray:#fff;
+#particles-js{
+  width: 100%;
+  height: calc(100% - 100px);
+  position: absolute;   //设置absolute,其他DIV设置为relative，这样这个例子效果就作为背景
+}
+.loginBtn.el-button--primary {
+    color: #FFF;
+    opacity: 0.9;
+    background-color: #1b1b1b !important;
+    border-color: #1b1b1b !important;
+    transition: opacity .2s ease;
+}
+.loginBtn:hover {
+  opacity: 1;
+}
+$bg: #283443;
+$light_gray: #fff;
 $cursor: #fff;
 
 @supports (-webkit-mask: none) and (not (cater-color: $cursor)) {
@@ -173,16 +201,17 @@ $cursor: #fff;
 </style>
 
 <style lang="scss" scoped>
-$bg:#2d3a4b;
-$dark_gray:#889aa4;
-$light_gray:#eee;
+$bg: #2d3a4b;
+$dark_gray: #889aa4;
+$light_gray: #eee;
 
 .login-container {
   min-height: 100%;
   width: 100%;
   background-color: $bg;
   overflow: hidden;
-
+  background: url("../../assets/sky.871d198.jpg") no-repeat;
+  background-size: cover;
   .login-form {
     position: relative;
     width: 520px;
@@ -206,7 +235,7 @@ $light_gray:#eee;
 
   .svg-container {
     padding: 6px 5px 6px 15px;
-    color: $dark_gray;
+    color: $light_gray;
     vertical-align: middle;
     width: 30px;
     display: inline-block;
