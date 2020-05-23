@@ -138,8 +138,8 @@ export const constantRoutes = [
 ]
 
 const createRouter = () => new Router({
-  // mode: 'history', // require service support
-  // base: '/vue_blog/',
+  mode: 'history', // require service support
+  base: '/vue_blog/',
   scrollBehavior: () => ({ y: 0 }),
   routes: constantRoutes
 })
